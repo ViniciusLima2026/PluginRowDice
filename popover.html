@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ficha de Perícias</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      padding: 12px;
+      min-height: 100vh;
+    }
+
+    h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .section { margin-bottom: 14px; }
+
+    /* Nome do personagem */
+    #nome-personagem {
+      width: 100%;
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 7px 10px;
+    }
+
+    /* Lista de perícias */
+    .pericia-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .pericia-nome-label {
+      flex: 1;
+      font-size: 13px;
+      color: #ccc;
+    }
+
+    .pericia-nome-input {
+      flex: 1;
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 13px;
+      padding: 4px 7px;
+    }
+
+    .pericia-valor {
+      width: 52px;
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 13px;
+      padding: 4px 6px;
+      text-align: center;
+    }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: #555;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .btn-remove:hover { color: #e74c3c; }
+
+    .btn-add {
+      width: 100%;
+      background: none;
+      border: 1px dashed #333;
+      border-radius: 6px;
+      color: #666;
+      font-size: 12px;
+      padding: 5px;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+    .btn-add:hover { border-color: #555; color: #aaa; }
+
+    /* Área de rolar */
+    .roll-area {
+      background: #16213e;
+      border: 1px solid #2a2a4a;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .roll-select-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      justify-content: center;
+    }
+
+    #pericia-select {
+      flex: 1;
+      background: #1a1a2e;
+      border: 1px solid #2a2a4a;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 13px;
+      padding: 5px 7px;
+    }
+
+    .dado-num {
+      font-size: 52px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      margin: 6px 0;
+      transition: transform 0.15s;
+    }
+    .dado-num.spin { transform: scale(1.2) rotate(-8deg); }
+
+    .resultado-badge {
+      display: inline-block;
+      padding: 4px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 6px 0 4px;
+    }
+    .badge-critico  { background: #1a472a; color: #2ecc71; }
+    .badge-falha    { background: #4a1a1a; color: #e74c3c; }
+    .badge-normal   { background: #1e2a40; color: #7fbbff; }
+
+    .soma-detalhe {
+      font-size: 12px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .btn-roll {
+      margin-top: 10px;
+      width: 100%;
+      padding: 9px;
+      background: #2d3a8c;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+    }
+    .btn-roll:hover { background: #3a4aaa; }
+    .btn-roll:active { transform: scale(0.98); }
+
+    .btn-salvar {
+      width: 100%;
+      padding: 7px;
+      background: none;
+      border: 1px solid #2a2a4a;
+      border-radius: 6px;
+      color: #888;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+    .btn-salvar:hover { border-color: #555; color: #ccc; }
+
+    /* Histórico */
+    .hist-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid #1e1e3a;
+      font-size: 12px;
+      color: #666;
+    }
+    .hist-item:last-child { border-bottom: none; }
+    .hist-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    input:focus, select:focus { outline: 1px solid #3a4aaa; }
+  </style>
+</head>
+<body>
+
+  <!-- Nome -->
+  <div class="section">
+    <h2>Personagem</h2>
+    <input type="text" id="nome-personagem" placeholder="Nome do personagem" value="Meu Personagem" />
+  </div>
+
+  <!-- Perícias -->
+  <div class="section">
+    <h2>Perícias</h2>
+    <div id="pericias-lista"></div>
+    <button class="btn-add" onclick="adicionarPericia()">+ Adicionar perícia</button>
+  </div>
+
+  <!-- Rolar dado -->
+  <div class="section">
+    <h2>Rolar dado</h2>
+    <div class="roll-area">
+      <div class="roll-select-row">
+        <span style="color:#888; font-size:12px;">Perícia:</span>
+        <select id="pericia-select"></select>
+      </div>
+      <div class="dado-num" id="dado-num">—</div>
+      <div id="resultado-area" style="min-height:52px;"></div>
+      <button class="btn-roll" onclick="rolarDado()">🎲 Rolar d20</button>
+    </div>
+  </div>
+
+  <!-- Salvar -->
+  <div class="section">
+    <button class="btn-salvar" onclick="salvarFicha()">💾 Salvar ficha na sala</button>
+  </div>
+
+  <!-- Histórico -->
+  <div class="section" id="historico-section" style="display:none;">
+    <h2>Histórico</h2>
+    <div id="historico-lista"></div>
+  </div>
+
+<script type="module">
+  import OBR from "https://cdn.jsdelivr.net/npm/@owlbear-rodeo/sdk@1.5.0/+esm";
+
+  // ─── Estado local ───────────────────────────────────────────────────────────
+  let pericias = [
+    { id: 1, nome: "Atletismo",   valor: 3,  fixo: true },
+    { id: 2, nome: "Furtividade", valor: 1,  fixo: true },
+    { id: 3, nome: "Percepção",   valor: 4,  fixo: true },
+    { id: 4, nome: "Persuasão",   valor: 2,  fixo: true },
+    { id: 5, nome: "Arcana",      valor: 0,  fixo: true },
+  ];
+  let historico = [];
+  let proximoId = 100;
+
+  // ─── Owlbear pronto ─────────────────────────────────────────────────────────
+  OBR.onReady(async () => {
+    // Carrega ficha salva na sala (se existir)
+    const meta = await OBR.room.getMetadata();
+    const salvo = meta["ficha-pericias/data"];
+    if (salvo) {
+      document.getElementById("nome-personagem").value = salvo.nome || "Meu Personagem";
+      pericias = salvo.pericias || pericias;
+    }
+    render();
+  });
+
+  // ─── Render lista de perícias ────────────────────────────────────────────────
+  function render() {
+    const lista = document.getElementById("pericias-lista");
+    lista.innerHTML = "";
+
+    pericias.forEach((p) => {
+      const row = document.createElement("div");
+      row.className = "pericia-row";
+
+      if (p.fixo) {
+        row.innerHTML = `
+          <span class="pericia-nome-label">${p.nome}</span>
+          <input class="pericia-valor" type="number" value="${p.valor}" min="-10" max="20"
+            onchange="atualizarValor(${p.id}, this.value)" />
+        `;
+      } else {
+        row.innerHTML = `
+          <input class="pericia-nome-input" type="text" value="${p.nome}" placeholder="Nome"
+            onchange="atualizarNome(${p.id}, this.value)" />
+          <input class="pericia-valor" type="number" value="${p.valor}" min="-10" max="20"
+            onchange="atualizarValor(${p.id}, this.value)" />
+          <button class="btn-remove" onclick="remover(${p.id})" title="Remover">&times;</button>
+        `;
+      }
+      lista.appendChild(row);
+    });
+
+    atualizarSelect();
+  }
+
+  function atualizarSelect() {
+    const sel = document.getElementById("pericia-select");
+    const atual = sel.value;
+    sel.innerHTML = pericias.map(p =>
+      `<option value="${p.id}" ${atual == p.id ? "selected" : ""}>
+        ${p.nome} (${p.valor >= 0 ? "+" : ""}${p.valor})
+      </option>`
+    ).join("");
+  }
+
+  // ─── Ações da ficha ─────────────────────────────────────────────────────────
+  window.atualizarValor = (id, val) => {
+    const p = pericias.find(x => x.id === id);
+    if (p) p.valor = parseInt(val) || 0;
+    atualizarSelect();
+  };
+
+  window.atualizarNome = (id, nome) => {
+    const p = pericias.find(x => x.id === id);
+    if (p) p.nome = nome;
+    atualizarSelect();
+  };
+
+  window.remover = (id) => {
+    pericias = pericias.filter(x => x.id !== id);
+    render();
+  };
+
+  window.adicionarPericia = () => {
+    pericias.push({ id: proximoId++, nome: "Nova perícia", valor: 0, fixo: false });
+    render();
+  };
+
+  // ─── Salvar na sala ──────────────────────────────────────────────────────────
+  window.salvarFicha = async () => {
+    const nome = document.getElementById("nome-personagem").value;
+    await OBR.room.setMetadata({
+      "ficha-pericias/data": { nome, pericias }
+    });
+    OBR.notification.show("Ficha salva! ✓", "SUCCESS");
+  };
+
+  // ─── Rolar dado ──────────────────────────────────────────────────────────────
+  window.rolarDado = () => {
+    const dadoEl     = document.getElementById("dado-num");
+    const resultEl   = document.getElementById("resultado-area");
+    const nomePersonagem = document.getElementById("nome-personagem").value || "Personagem";
+
+    // Pega a perícia selecionada
+    const idSel = parseInt(document.getElementById("pericia-select").value);
+    const pericia = pericias.find(p => p.id === idSel);
+
+    // Animação
+    dadoEl.textContent = "?";
+    dadoEl.classList.add("spin");
+    resultEl.innerHTML = "";
+
+    setTimeout(() => {
+      dadoEl.classList.remove("spin");
+
+      const rolagem = Math.floor(Math.random() * 20) + 1;
+      dadoEl.textContent = rolagem;
+
+      let badge = "", detalhe = "", tipo = "";
+
+      if (rolagem === 20) {
+        badge   = `<div class="resultado-badge badge-critico">⭐ CRÍTICO!</div>`;
+        detalhe = `20 natural — crítico automático`;
+        tipo    = "Crítico";
+      } else if (rolagem === 1) {
+        badge   = `<div class="resultado-badge badge-falha">💀 FALHA CRÍTICA!</div>`;
+        detalhe = `1 natural — falha automática`;
+        tipo    = "Falha crítica";
+      } else {
+        const total = rolagem + pericia.valor;
+        const sinal = pericia.valor >= 0 ? "+" : "";
+        badge   = `<div class="resultado-badge badge-normal">Total: ${total}</div>`;
+        detalhe = `${rolagem} (dado) ${sinal}${pericia.valor} (${pericia.nome}) = ${total}`;
+        tipo    = `${total}`;
+      }
+
+      resultEl.innerHTML = `${badge}<div class="soma-detalhe">${detalhe}</div>`;
+
+      // Notificação no Owlbear
+      const msgNotif = rolagem === 20
+        ? `${nomePersonagem} — CRÍTICO em ${pericia.nome}!`
+        : rolagem === 1
+          ? `${nomePersonagem} — FALHA CRÍTICA em ${pericia.nome}!`
+          : `${nomePersonagem} rolou ${rolagem} + ${pericia.valor} = ${rolagem + pericia.valor} em ${pericia.nome}`;
+
+      OBR.notification.show(msgNotif, rolagem === 1 ? "ERROR" : rolagem === 20 ? "SUCCESS" : "DEFAULT");
+
+      // Histórico local
+      historico.unshift({ pericia: pericia.nome, rolagem, tipo });
+      if (historico.length > 8) historico.pop();
+      renderHistorico();
+    }, 300);
+  };
+
+  // ─── Histórico ───────────────────────────────────────────────────────────────
+  function renderHistorico() {
+    const sec  = document.getElementById("historico-section");
+    const lista = document.getElementById("historico-lista");
+    sec.style.display = "block";
+    lista.innerHTML = historico.map(h => {
+      const cls = h.tipo === "Crítico" ? "badge-critico" : h.tipo === "Falha crítica" ? "badge-falha" : "badge-normal";
+      return `<div class="hist-item">
+        <span>${h.pericia}</span>
+        <span class="hist-badge ${cls}">${h.rolagem} → ${h.tipo}</span>
+      </div>`;
+    }).join("");
+  }
+</script>
+</body>
+</html>

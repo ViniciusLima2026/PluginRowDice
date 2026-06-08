@@ -1,0 +1,18 @@
+{
+  "author": "seu-nome",
+  "name": "Ficha de Perícias",
+  "description": "Ficha de personagem com rolagem de d20 e cálculo automático de crítico",
+  "version": "1.0.0",
+  "action": {
+    "title": "Ficha de Perícias",
+    "icon": "/public/icon.svg",
+    "popover": {
+      "url": "/popover.html",
+      "height": 500,
+      "width": 340
+    }
+  },
+  "background": {
+    "url": "/background.html"
+  }
+}
